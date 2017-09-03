@@ -12,7 +12,6 @@ The goals / steps of this project are the following:
 * Warp the detected lane boundaries back onto the original image.
 * Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
 
-## [Rubric](https://review.udacity.com/#!/rubrics/571/view) Points
 ---
 ### Writeup / README
 
@@ -22,7 +21,7 @@ The goals / steps of this project are the following:
 
 The code for this step is contained in the code cells of the IPython notebook located in `./camera_calibration.ipynb`.
 
-I start by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
+I started by preparing "object points", which will be the (x, y, z) coordinates of the chessboard corners in the world. Here I am assuming the chessboard is fixed on the (x, y) plane at z=0, such that the object points are the same for each calibration image.  Thus, `objp` is just a replicated array of coordinates, and `objpoints` will be appended with a copy of it every time I successfully detect all chessboard corners in a test image.  `imgpoints` will be appended with the (x, y) pixel position of each of the corners in the image plane with each successful chessboard detection.  
 
 I then used the output `objpoints` and `imgpoints` to compute the camera calibration and distortion coefficients using the `cv2.calibrateCamera()` function.  I applied this distortion correction to the test image `calibration4.jpg` using the `cv2.undistort()` function and obtained this result: 
 
@@ -36,17 +35,15 @@ I then used the output `objpoints` and `imgpoints` to compute the camera calibra
 
 Now that we have calculated the distortion coefficients, we can use them to undistort images by using the `cv2.undistort()` function. 
 
-Here is an example:  
-The effect of undistortion is best seen at the left and right borders.
-
 Applied to a real world image the effect can be best seen at the right margin looking at the white car. 
+Here is an example:  
  ![Calibration Street](output_images/writeup_calibration_street.jpg)
  
 
 
 #### 2. Describe how (and identify where in your code) you used color transforms, gradients or other methods to create a thresholded binary image.  Provide an example of a binary image result.
 
-I tried all methods introduced in the course. I started with gradients. It's important to convert the color space to gray. 
+I tried all methods introduced in this course. I started with gradients and it's important to convert the color space from RGB to gray. 
 
 I tested thresholds on the magnitude of the gradients, but the lanes couldn't be identified well:
 ![Sobee Magnitude](output_images/writeup_sobel_mag.jpg)
@@ -63,7 +60,7 @@ Doing more research I came over to the Lab color space. In combination of gradie
 Thne I tried the S channel of HLS and b-Channel of Lab without gradients and got a better, brighter result:
 ![Color HLS and Lab](output_images/writeup_combi_sb_channels.jpg)
 
-** Finally I decided to leave the Sobel Tranformation away and focus on just L-Channel of HLS and Lab b-channel:**
+**Finally I decided to leave the Sobel Tranformation away and focus on just L-Channel of HLS and Lab b-channel:**
 ![Color HLS and Lab](output_images/writeup_combi_lb_channels.jpg)
 
 
@@ -77,7 +74,7 @@ def warp(img, M=M):
 ```
 
 The `warp()` function takes as inputs an image (`img`) and calls the fuction `get_warp_parameters()` to get based on a source and destination rectangle the transformation matrix.  
-I chosed to hardcode the source and destination points in the following manner by reading out the pixels on an image for a straight line road test image:
+I chosed to hardcode the source and destination points in the following manner by reading out the pixels on an image of a straight line road test image:
 
 ```python
 def get_warp_parameters():
@@ -93,11 +90,12 @@ def get_warp_parameters():
 
 I verified that my perspective transform was working as expected by drawing the `src` and `dst` points onto a test image and its warped counterpart to verify that the lines appear parallel in the warped image.
 
-I tried to first apply the color threshold filter and then to warp the image. This gave better results than the other way around.
-![Color Warped](output_images/writeup_color_warped.jpg)
-First warping the image and then applying the colorthreshold filter:
+This picture shows first warping the image and then applying the color threshold filter:
 ![Warped Color](output_images/writeup_warped_color.jpg)
-The first method worked better, so I stayed with this method.
+
+Then I tried applying the color threshold filter first and then to warp the image. This gave better results than the other way around.
+![Color Warped](output_images/writeup_color_warped.jpg)
+This method worked better, so I stayed with this method.
 
 
 #### 4. Describe how (and identify where in your code) you identified lane-line pixels and fit their positions with a polynomial?
@@ -146,7 +144,7 @@ Here is an example of my result on a test image:
 
 #### 1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (wobbly lines are ok but no catastrophic failures that would cause the car to drive off the road!).
 
-The video is generated by processing all frames separately. I tested my preprocessing pipeline on all test images.
+The video is generated by processing all frames successively. I tested my preprocessing pipeline on all test images.
 The pipeline can be found in the function
 ```python
 	def preprocess_image(img, debug=False):
@@ -172,9 +170,10 @@ The pipeline was reduced to the following essential functions:
 
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
-The pipeline works well on the normal project video and on the challenge video. The challenge was to find the lines when the light conditions varies strongly. 
+The pipeline works well on the normal project video and on the challenge video. The challenge was to find the lines when the light conditions varies strongly. The right choice of color transforms was essential.
 
-It did not work for the harder challenge video. The reason lies in the S-Curves. It's difficult to find a polynomium to fit. An approach might be to use polynomiums of higher order. Also splitting the image into different parts might be helpful. This way the parameters for color transformation could be set separatetly.  
+The pipeline did'nt work for the harder challenge video. The reason lies in the S-Curves. It's difficult to find a polynomium to fit. An approach might be to use polynomiums of higher order. Also splitting the image into different parts might be helpful. This way the parameters for color transformation could be set separatetly.  
 Other reasons are the very sharp curves. The sliding windows move to top to search for the next part of the lane, but  they should search more sideways in this case. 
+
 
 
