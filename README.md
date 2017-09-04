@@ -129,7 +129,7 @@ xm_per_pix = 3.7/380 # meters per pixel in x dimension  380 px = distance in war
 
 #### 6. Provide an example image of your result plotted back down onto the road such that the lane area is identified clearly.
 
-In the same python notebook I implemented this step in the function `draw_lane()`. 
+In the same python notebook I implemented this step in the function `draw_lane()`. The lanes are drawn back onto the undistorted image.
 
 ```python 
 def draw_lane(img, warped, left_fit, right_fit, Minv): 
